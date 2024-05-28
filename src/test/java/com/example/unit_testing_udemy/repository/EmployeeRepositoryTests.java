@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 
 @DataJpaTest
 public class EmployeeRepositoryTests {
@@ -86,6 +87,71 @@ public class EmployeeRepositoryTests {
 
 
     }
+    @Test
+    @DisplayName("test update employee")
+    public void givenEmployee_whenUpdating_thenGetNewEmployeeWithUpdatedValue(){
+        // given
+        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
+        // when
+        Long id = employeeRepository.save(employee).getId();
+
+        Employee foundEmployee = employeeRepository.findById(id).get();
+
+        foundEmployee.setEmail("wael2@gmail.com");
+        foundEmployee.setFirstName("wael2");
+        foundEmployee.setLastName("has2");
+
+        Employee updatedEmployee = employeeRepository.save(foundEmployee);
+
+
+        // then
+        Assertions.assertThat(updatedEmployee).isNotNull();
+        Assertions.assertThat(updatedEmployee.getEmail()).isEqualTo("wael2@gmail.com");
+        Assertions.assertThat(updatedEmployee.getFirstName()).isEqualTo("wael2");
+        Assertions.assertThat(updatedEmployee.getLastName()).isEqualTo("has2");
+    }
+
+    @Test
+    @DisplayName("test delete employee")
+    public void givenEmployee_whenDelete_thenThereIsNoEmployee(){
+        // given
+        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
+        Long id = employeeRepository.save(employee).getId();
+
+        // when
+        employeeRepository.delete(employee);
+
+        Optional<Employee> findEmployee = employeeRepository.findById(id);
+
+        // then
+
+        Assertions.assertThat(findEmployee).isEqualTo(Optional.empty());
+        ///OR
+        Assertions.assertThat(findEmployee).isEmpty();
+    }
+
+    ///Junit test for custom query using JPQl with index 1?
+    @Test
+    @DisplayName("test Find employee by JPQL")
+    public void givenFirstAndLastName_whenFindByIdJPQL_thenReturnEmployeeObject(){
+        // given
+        String firstName = "wael";
+        String lastName = "has";
+
+        Employee employee = Employee.builder().firstName(firstName).lastName(lastName).email("wael@gmail.com").build();
+        employeeRepository.save(employee);
+
+        // when
+
+        Employee foundedEmployee = employeeRepository.findByJPQL(firstName,lastName);
+
+        // then
+
+        Assertions.assertThat(foundedEmployee).isNotNull();
+    }
+
+
+    ///Junit test for custom query using JPQl with named parameter
 
     @Test
     public void given_when_then(){
