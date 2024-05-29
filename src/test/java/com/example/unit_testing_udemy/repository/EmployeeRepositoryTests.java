@@ -3,6 +3,7 @@ package com.example.unit_testing_udemy.repository;
 import com.example.unit_testing_udemy.model.Employee;
 import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,18 @@ public class EmployeeRepositoryTests {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    private Employee employee;
+    @BeforeEach
+    private void setup(){
+         employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
+    }
+
     @Test
     @DisplayName("Junit test for save Employee")
     public void givenEmployeeObject_whenSave_thenReturnSavedEmployee(){
 
         // given
 
-        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
 
         // when
 
@@ -41,7 +47,6 @@ public class EmployeeRepositoryTests {
     @DisplayName("test getting all employee")
     public void givenEmployeeList_whenGetAll_thenReturnListOfEmployee(){
         // given
-        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
         Employee employee2 = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
 
         employeeRepository.save(employee);
@@ -61,7 +66,6 @@ public class EmployeeRepositoryTests {
     @DisplayName("test get employee by id")
     public void givenEmployee_whenGetEmployeeById_thenReturnTheSameEmployee(){
         // given
-        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
 
         Long employeeId = employeeRepository.save(employee).getId();
 
@@ -75,7 +79,6 @@ public class EmployeeRepositoryTests {
     @DisplayName("test find employee by email")
     public void givenEmployee_whenFindByEmail_thenReturnEmployeeWithSameEmail(){
         // given
-        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
 
         employeeRepository.save(employee);
 
@@ -91,7 +94,6 @@ public class EmployeeRepositoryTests {
     @DisplayName("test update employee")
     public void givenEmployee_whenUpdating_thenGetNewEmployeeWithUpdatedValue(){
         // given
-        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
         // when
         Long id = employeeRepository.save(employee).getId();
 
@@ -115,7 +117,6 @@ public class EmployeeRepositoryTests {
     @DisplayName("test delete employee")
     public void givenEmployee_whenDelete_thenThereIsNoEmployee(){
         // given
-        Employee employee = Employee.builder().firstName("wael").lastName("has").email("wael@gmail.com").build();
         Long id = employeeRepository.save(employee).getId();
 
         // when
@@ -152,6 +153,62 @@ public class EmployeeRepositoryTests {
 
 
     ///Junit test for custom query using JPQl with named parameter
+    @Test
+    @DisplayName("test Find employee by JPQL named Paramater")
+    public void givenFirstAndLastName_whenFindByIdJPQLNamed_thenReturnEmployeeObject(){
+        // given
+        String firstName = "wael";
+        String lastName = "has";
+
+        Employee employee = Employee.builder().firstName(firstName).lastName(lastName).email("wael@gmail.com").build();
+        employeeRepository.save(employee);
+
+        // when
+
+        Employee foundedEmployee = employeeRepository.findByJPQLNamedParams(firstName,lastName);
+
+        // then
+
+        Assertions.assertThat(foundedEmployee).isNotNull();
+    }
+
+    @Test
+    @DisplayName("test Find employee by Native SQL query with index params")
+    public void givenFirstAndLastName_whenFindByIdCustomQuery_thenReturnEmployeeObject(){
+        // given
+        String firstName = "wael";
+        String lastName = "has";
+
+        Employee employee = Employee.builder().firstName(firstName).lastName(lastName).email("wael@gmail.com").build();
+        employeeRepository.save(employee);
+
+        // when
+
+        Employee foundedEmployee = employeeRepository.findByNativeSQL(firstName,lastName);
+
+        // then
+
+        Assertions.assertThat(foundedEmployee).isNotNull();
+    }
+
+    @Test
+    @DisplayName("test Find employee by Native SQL query with named params")
+    public void givenFirstAndLastName_whenFindByIdCustomQueryNamedParams_thenReturnEmployeeObject(){
+        // given
+        String firstName = "wael";
+        String lastName = "has";
+
+        Employee employee = Employee.builder().firstName(firstName).lastName(lastName).email("wael@gmail.com").build();
+        employeeRepository.save(employee);
+
+        // when
+
+        Employee foundedEmployee = employeeRepository.findByNativeSQLWithNamedParams(firstName,lastName);
+
+        // then
+
+        Assertions.assertThat(foundedEmployee).isNotNull();
+    }
 
     @Test
     public void given_when_then(){
